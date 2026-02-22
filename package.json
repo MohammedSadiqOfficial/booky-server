@@ -4,7 +4,12 @@
 	"main": "index.js",
 	"type": "module",
 	"scripts": {
-		"dev": "node --watch server.js"
+		"dev": "node --watch server.js",
+		"start": "node server.js",
+		"prisma:generate": "prisma generate",
+		"prisma:push": "prisma db push",
+		"prisma:studio": "prisma studio",
+		"build": "prisma generate"
 	},
 	"keywords": [],
 	"author": "",
