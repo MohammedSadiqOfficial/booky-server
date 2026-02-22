@@ -8,14 +8,18 @@ export const getBooks = async (req, res) => {
 		const { userId } = await req.auth();
 
 		const books = await prisma.book.findMany({
-			where: { userId },
+			where: {
+				user: {
+					clerkId: userId,
+				},
+			},
 			orderBy: { createdAt: "desc" },
 		});
 
 		return res.status(200).json(books);
 	} catch (error) {
 		console.log(error);
-		console.log(error?.message)
+		console.log(error?.message);
 		return res.status(500).json({ error: "Failed to fetch books" });
 	}
 };
@@ -34,7 +38,12 @@ export const getBookById = async (req, res) => {
 		const { id } = validate.data;
 
 		const book = await prisma.book.findFirst({
-			where: { id, userId },
+			where: {
+				id,
+				user: {
+					clerkId: userId,
+				},
+			},
 		});
 
 		if (!book) {
@@ -63,7 +72,11 @@ export const createBook = async (req, res) => {
 		const createdBook = await prisma.book.create({
 			data: {
 				...validate.data,
-				userId,
+				user: {
+					connect: {
+						clerkId: userId,
+					},
+				},
 			},
 		});
 
@@ -93,13 +106,17 @@ export const updateBook = async (req, res) => {
 
 		const { id, ...data } = validate.data;
 
-		console.log("Data:", data);
 		if (!id) {
 			return res.status(400).json({ message: "Id is required" });
 		}
 
 		const book = await prisma.book.findFirst({
-			where: { id, userId },
+			where: {
+				id,
+				user: {
+					clerkId: userId,
+				},
+			},
 		});
 
 		if (!book) {
@@ -133,7 +150,9 @@ export const deleteBook = async (req, res) => {
 
 		const result = await prisma.book.deleteMany({
 			where: {
-				userId,
+				user: {
+					clerkId: userId,
+				},
 				id: { in: ids },
 			},
 		});

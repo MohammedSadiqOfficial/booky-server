@@ -12,7 +12,11 @@ export const getNotes = async (req, res) => {
 		const { userId } = await req.auth();
 
 		const notes = await prisma.note.findMany({
-			where: { userId },
+			where: {
+				user: {
+					clerkId: userId,
+				},
+			},
 			orderBy: { createdAt: "desc" },
 		});
 
@@ -37,7 +41,12 @@ export const getNotesByBookId = async (req, res) => {
 		const { id: bookId } = validate.data;
 
 		const notes = await prisma.note.findMany({
-			where: { userId, bookId },
+			where: {
+				user: {
+					clerkId: userId,
+				},
+				bookId,
+			},
 			orderBy: { createdAt: "desc" },
 		});
 
@@ -62,7 +71,12 @@ export const createNote = async (req, res) => {
 		const { bookId, ...data } = validate.data;
 
 		const book = await prisma.book.findFirst({
-			where: { id:bookId, userId },
+			where: {
+				id: bookId,
+				user: {
+					clerkId: userId,
+				},
+			},
 		});
 
 		if (!book) {
@@ -72,8 +86,16 @@ export const createNote = async (req, res) => {
 		const note = await prisma.note.create({
 			data: {
 				...data,
-				bookId,
-				userId,
+				book: {
+					connect: {
+						id: bookId,
+					},
+				},
+				user: {
+					connect: {
+						clerkId: userId,
+					},
+				},
 			},
 		});
 
@@ -107,7 +129,12 @@ export const updateNote = async (req, res) => {
 		const data = bodyValidate.data;
 
 		const note = await prisma.note.findFirst({
-			where: { id, userId },
+			where: {
+				id,
+				user: {
+					clerkId: userId,
+				},
+			},
 		});
 
 		if (!note) {
@@ -140,7 +167,12 @@ export const deleteNote = async (req, res) => {
 		const { id } = validate.data;
 
 		const note = await prisma.note.findFirst({
-			where: { id, userId },
+			where: {
+				id,
+				user: {
+					clerkId: userId,
+				},
+			},
 		});
 
 		if (!note) {
